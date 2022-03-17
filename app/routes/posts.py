@@ -5,20 +5,20 @@ from app.controllers import posts
 
 def posts_route(app):
     @app.get("/posts")
-    def get_posts():
+    def read_posts():
         return jsonify(posts.get_posts_all())
 
-    @app.get("/posts/<id>")
-    def get_one_post(id):
+    @app.get("/posts/<int:id>")
+    def read_post_by_id(id):
         try:
-            one_post_id = posts.get_posts_id(int(id))
+            one_post_id = posts.get_posts_id(id)
         except (UnboundLocalError, TypeError):
             return {"error": f"id {id} not found"}, HTTPStatus.NOT_FOUND
         return one_post_id
 
     
     @app.post("/posts")
-    def posts_created():
+    def create_post():
         data = request.get_json()
 
         try:
@@ -31,10 +31,10 @@ def posts_route(app):
 
         return data_post.__dict__, HTTPStatus.CREATED
 
-    @app.patch("/posts/<id>")
-    def patch_posts(id):
+    @app.patch("/posts/<int:id>")
+    def update_post(id):
         data = request.get_json()
-        data_patch = posts.att_posts(data, int(id))
+        data_patch = posts.att_posts(data, id)
 
         if data_patch:
             del data_patch["_id"]
@@ -44,9 +44,9 @@ def posts_route(app):
 
 
 
-    @app.delete("/posts/<id>")
-    def delete_posts_id(id):
-        delete = posts.remove_post_id(int(id))
+    @app.delete("/posts/<int:id>")
+    def delete_post(id):
+        delete = posts.remove_post_id(id)
         if delete:
             del delete["_id"]
             return delete, HTTPStatus.OK
